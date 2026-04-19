@@ -56,11 +56,15 @@ export function Lesson({ unitId, lessonId, narrator, onExit }: Props) {
       }
       return
     }
-    if (idx + 1 >= exercises.length) {
-      setPhase('minigame')
-    } else {
-      setIdx(i => i + 1)
-    }
+    // Breathing room before the next exercise's audio starts — otherwise the
+    // next word lands right on top of the feedback and feels rushed.
+    setTimeout(() => {
+      if (idx + 1 >= exercises.length) {
+        setPhase('minigame')
+      } else {
+        setIdx(i => i + 1)
+      }
+    }, 650)
   }
 
   const afterMinigame = () => {

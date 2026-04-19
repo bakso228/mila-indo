@@ -6,7 +6,7 @@ import { WordPicture } from '../WordPicture'
 import { shuffle, firstExerciseOfSession, introFor, type ExerciseProps } from './shared'
 
 export function PictureMatch({ options, narrator, onDone }: ExerciseProps) {
-  const { say } = useSpeech()
+  const { say, stop } = useSpeech()
   const { ding, boing, cheer } = useSfx()
   const pics = useMemo(() => options.slice(0, 4), [])
   const audios = useMemo(() => shuffle(pics), [])
@@ -18,6 +18,7 @@ export function PictureMatch({ options, narrator, onDone }: ExerciseProps) {
 
   useEffect(() => {
     if (firstExerciseOfSession()) say(introFor(narrator, 'pictureMatch'), narrator)
+    return () => { stop() }
   }, [])
 
   useEffect(() => {
@@ -65,7 +66,7 @@ export function PictureMatch({ options, narrator, onDone }: ExerciseProps) {
             const isSel = selectedAudio === a.id
             return (
               <motion.button key={a.id} whileTap={{ scale: 0.95 }} disabled={isDone}
-                onClick={() => { setSelectedAudio(a.id); say(a.word, 'id') }}
+                onClick={() => { setSelectedAudio(a.id); say(a.word, 'id', { preempt: true }) }}
                 className={`rounded-2xl p-2 shadow-kid border-4 min-h-[92px] flex flex-col items-center justify-center gap-1 ${
                   isDone ? 'bg-mint border-mint opacity-60' : isSel ? 'bg-sunny border-teal' : 'bg-white border-white'}`}>
                 <span className="text-4xl">🔊</span>

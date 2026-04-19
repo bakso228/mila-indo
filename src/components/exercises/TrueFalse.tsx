@@ -7,7 +7,7 @@ import { WordHeader } from './WordHeader'
 import { firstExerciseOfSession, introFor, type ExerciseProps } from './shared'
 
 export function TrueFalse({ target, options, narrator, onDone }: ExerciseProps) {
-  const { say } = useSpeech()
+  const { say, stop } = useSpeech()
   const { ding, boing } = useSfx()
   const shownWord = useMemo(() => {
     const wrong = options.find(o => o.id !== target.id) ?? target
@@ -19,6 +19,7 @@ export function TrueFalse({ target, options, narrator, onDone }: ExerciseProps) 
   useEffect(() => {
     if (firstExerciseOfSession()) say(introFor(narrator, 'trueFalse'), narrator)
     say(target.word, 'id', { repeat: 2, gapMs: 500 })
+    return () => { stop() }
   }, [target.id])
 
   const handle = (answer: boolean) => {
@@ -26,12 +27,12 @@ export function TrueFalse({ target, options, narrator, onDone }: ExerciseProps) 
     const right = answer === correctAnswer
     if (right) {
       setState('right'); ding()
-      say('Benar!', 'id')
-      setTimeout(() => onDone('correct'), 1000)
+      say(`Benar! ${target.word}`, 'id')
+      setTimeout(() => onDone('correct'), 1300)
     } else {
       setState('wrong'); boing()
       say(target.word, 'id', { rate: 0.4 })
-      setTimeout(() => onDone('wrong'), 1200)
+      setTimeout(() => onDone('wrong'), 1300)
     }
   }
 

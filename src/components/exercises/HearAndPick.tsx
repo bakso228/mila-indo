@@ -7,28 +7,33 @@ import { WordHeader } from './WordHeader'
 import { firstExerciseOfSession, introFor, type ExerciseProps } from './shared'
 
 export function HearAndPick({ target, options, narrator, onDone }: ExerciseProps) {
-  const { say } = useSpeech()
+  const { say, stop } = useSpeech()
   const { ding, boing } = useSfx()
-  const [picked, setPicked] = useState<string | null>(null)
+  const [selected, setSelected] = useState<string | null>(null)
   const [state, setState] = useState<'idle' | 'right' | 'wrong'>('idle')
 
   useEffect(() => {
     if (firstExerciseOfSession()) say(introFor(narrator, 'hearAndPick'), narrator)
     say(target.word, 'id', { repeat: 2, gapMs: 500 })
+    return () => { stop() }
   }, [target.id])
 
-  const handlePick = (id: string) => {
+  const choose = (id: string) => {
     if (state !== 'idle') return
-    setPicked(id)
-    if (id === target.id) {
+    setSelected(id)
+  }
+
+  const submit = () => {
+    if (!selected || state !== 'idle') return
+    if (selected === target.id) {
       setState('right'); ding()
-      say('Benar!', 'id'); say(target.word, 'id')
-      setTimeout(() => onDone('correct'), 1100)
+      say(`Benar! ${target.word}`, 'id')
+      setTimeout(() => onDone('correct'), 1200)
     } else {
       setState('wrong'); boing()
-      say(target.word, 'id', { rate: 0.4 })
-      if (Math.random() < 0.3) say('Coba lagi', 'id')
-      setTimeout(() => { setState('idle'); setPicked(null) }, 1400)
+      const extra = Math.random() < 0.3 ? ' Coba lagi' : ''
+      say(`${target.word}.${extra}`, 'id', { rate: 0.4 })
+      setTimeout(() => { setState('idle'); setSelected(null) }, 1500)
     }
   }
 
@@ -38,18 +43,19 @@ export function HearAndPick({ target, options, narrator, onDone }: ExerciseProps
       <div className="grid grid-cols-2 gap-4 w-full max-w-md">
         {options.map(opt => {
           const isTarget = opt.id === target.id
-          const isPicked = picked === opt.id
-          const bg = state === 'idle' ? 'bg-white'
-            : isPicked && isTarget ? 'bg-mint'
-            : isPicked ? 'bg-coral/40'
-            : 'bg-white'
+          const isSelected = selected === opt.id
+          const bg = state === 'right' && isSelected ? 'bg-mint border-teal'
+                  : state === 'wrong' && isSelected ? 'bg-coral/40 border-coral'
+                  : isSelected ? 'bg-sunny border-coral'
+                  : 'bg-white border-white'
           return (
             <motion.button
               key={opt.id}
               whileTap={{ scale: 0.95 }}
-              onClick={() => handlePick(opt.id)}
-              className={`rounded-3xl ${bg} p-3 shadow-kid border-4 border-white flex flex-col items-center justify-center gap-1 min-h-[160px]`}
+              onClick={() => choose(opt.id)}
+              className={`rounded-3xl ${bg} border-4 p-3 shadow-kid flex flex-col items-center justify-center gap-1 min-h-[160px]`}
               aria-label={opt.en}
+              aria-pressed={isSelected}
             >
               <WordPicture word={opt} size={90} />
               <span className="font-bold text-base sm:text-lg text-center leading-tight">{opt.word}</span>
@@ -57,6 +63,25 @@ export function HearAndPick({ target, options, narrator, onDone }: ExerciseProps
           )
         })}
       </div>
+      <SubmitButton onClick={submit} enabled={!!selected && state === 'idle'} narrator={narrator} />
     </div>
+  )
+}
+
+export function SubmitButton({ onClick, enabled, narrator }:
+  { onClick: () => void; enabled: boolean; narrator: 'en' | 'de' }) {
+  return (
+    <motion.button
+      whileTap={enabled ? { scale: 0.95 } : undefined}
+      onClick={enabled ? onClick : undefined}
+      disabled={!enabled}
+      className={`mt-2 rounded-3xl px-8 py-4 font-bold text-2xl shadow-kid flex items-center gap-3 ${
+        enabled ? 'bg-mint text-black active:translate-y-1 active:shadow-none' : 'bg-white/60 text-gray-400'
+      }`}
+      aria-label="Submit answer"
+    >
+      <span className="text-3xl leading-none">✓</span>
+      <span className="text-base sm:text-lg">{narrator === 'en' ? 'Check' : 'Prüfen'}</span>
+    </motion.button>
   )
 }

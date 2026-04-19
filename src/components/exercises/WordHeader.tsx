@@ -10,8 +10,8 @@ type Props = {
 // Middle: the word text, big and bold — still solvable without reading.
 export function WordHeader({ word, hideWord = false }: Props) {
   const { say } = useSpeech()
-  const normal = () => say(word, 'id')
-  const slow = () => say(word, 'id', { rate: 0.4 })
+  const normal = () => say(word, 'id', { preempt: true })
+  const slow = () => say(word, 'id', { rate: 0.4, preempt: true })
 
   return (
     <div className="w-full max-w-md mx-auto flex items-center justify-center gap-3 my-2 px-2">

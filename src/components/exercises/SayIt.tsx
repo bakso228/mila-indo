@@ -9,7 +9,7 @@ import { WordHeader } from './WordHeader'
 import { firstExerciseOfSession, introFor, type ExerciseProps } from './shared'
 
 export function SayIt({ target, narrator, onDone }: ExerciseProps) {
-  const { say } = useSpeech()
+  const { say, stop } = useSpeech()
   const { ding, cheer } = useSfx()
   const rec = useSpeechRecognition('id-ID')
   const mic = useMicRecording()
@@ -19,13 +19,14 @@ export function SayIt({ target, narrator, onDone }: ExerciseProps) {
   useEffect(() => {
     if (firstExerciseOfSession()) say(introFor(narrator, 'sayIt'), narrator)
     say(target.word, 'id', { repeat: 2, gapMs: 500 })
+    return () => { stop() }
   }, [target.id])
 
   useEffect(() => {
     if (!rec.listening && rec.heard) {
       if (matches(rec.heard, target.word)) {
         setResult('heard-right'); cheer()
-        say('Hebat!', 'id'); say(target.word, 'id')
+        say(`Hebat! ${target.word}`, 'id')
       } else {
         setResult('heard-wrong')
         say(target.word, 'id', { rate: 0.4 })
