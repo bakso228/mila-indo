@@ -3,12 +3,11 @@ import { motion } from 'framer-motion'
 import { useSpeech } from '../../hooks/useSpeech'
 import { useSfx } from '../../hooks/useSfx'
 import { WordPicture } from '../WordPicture'
-import { shuffle, type ExerciseProps } from './shared'
+import { shuffle, firstExerciseOfSession, introFor, type ExerciseProps } from './shared'
 
-export function PictureMatch({ target: _target, options, narrator, onDone }: ExerciseProps) {
+export function PictureMatch({ options, narrator, onDone }: ExerciseProps) {
   const { say } = useSpeech()
   const { ding, boing, cheer } = useSfx()
-  // Ensure exactly 4 by padding if needed
   const pics = useMemo(() => options.slice(0, 4), [])
   const audios = useMemo(() => shuffle(pics), [])
 
@@ -18,13 +17,15 @@ export function PictureMatch({ target: _target, options, narrator, onDone }: Exe
   const [wrongPulse, setWrongPulse] = useState<string | null>(null)
 
   useEffect(() => {
-    say(narrator === 'en' ? 'Match the sounds to the pictures!' : 'Finde die Paare!', narrator)
+    if (firstExerciseOfSession()) say(introFor(narrator, 'pictureMatch'), narrator)
   }, [])
 
   useEffect(() => {
     if (!selectedPic || !selectedAudio) return
     if (selectedPic === selectedAudio) {
       ding()
+      const word = pics.find(p => p.id === selectedPic)
+      if (word) say(word.word, 'id')
       const nextMatched = new Set(matched); nextMatched.add(selectedPic)
       setMatched(nextMatched)
       setSelectedPic(null); setSelectedAudio(null)
@@ -50,9 +51,10 @@ export function PictureMatch({ target: _target, options, narrator, onDone }: Exe
             return (
               <motion.button key={p.id} whileTap={{ scale: 0.95 }} disabled={isDone}
                 onClick={() => setSelectedPic(p.id)}
-                className={`rounded-2xl p-3 shadow-kid border-4 h-24 grid place-items-center ${
+                className={`rounded-2xl p-2 shadow-kid border-4 min-h-[92px] flex flex-col items-center justify-center gap-1 ${
                   isDone ? 'bg-mint border-mint opacity-60' : isSel ? 'bg-sunny border-coral' : wrong ? 'bg-coral/40 border-coral' : 'bg-white border-white'}`}>
-                <WordPicture word={p} size={70} />
+                <WordPicture word={p} size={56} />
+                <span className="font-bold text-xs sm:text-sm text-center leading-tight">{p.word}</span>
               </motion.button>
             )
           })}
@@ -64,9 +66,10 @@ export function PictureMatch({ target: _target, options, narrator, onDone }: Exe
             return (
               <motion.button key={a.id} whileTap={{ scale: 0.95 }} disabled={isDone}
                 onClick={() => { setSelectedAudio(a.id); say(a.word, 'id') }}
-                className={`rounded-2xl p-3 shadow-kid border-4 h-24 grid place-items-center ${
+                className={`rounded-2xl p-2 shadow-kid border-4 min-h-[92px] flex flex-col items-center justify-center gap-1 ${
                   isDone ? 'bg-mint border-mint opacity-60' : isSel ? 'bg-sunny border-teal' : 'bg-white border-white'}`}>
-                <span className="text-5xl">🔊</span>
+                <span className="text-4xl">🔊</span>
+                <span className="font-bold text-xs sm:text-sm">{a.word}</span>
               </motion.button>
             )
           })}

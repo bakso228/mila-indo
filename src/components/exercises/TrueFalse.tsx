@@ -3,12 +3,12 @@ import { motion } from 'framer-motion'
 import { useSpeech } from '../../hooks/useSpeech'
 import { useSfx } from '../../hooks/useSfx'
 import { WordPicture } from '../WordPicture'
-import type { ExerciseProps } from './shared'
+import { WordHeader } from './WordHeader'
+import { firstExerciseOfSession, introFor, type ExerciseProps } from './shared'
 
 export function TrueFalse({ target, options, narrator, onDone }: ExerciseProps) {
   const { say } = useSpeech()
   const { ding, boing } = useSfx()
-  // Randomly decide if we show the correct picture or a distractor
   const shownWord = useMemo(() => {
     const wrong = options.find(o => o.id !== target.id) ?? target
     return Math.random() < 0.5 ? target : wrong
@@ -17,8 +17,8 @@ export function TrueFalse({ target, options, narrator, onDone }: ExerciseProps) 
   const [state, setState] = useState<'idle' | 'right' | 'wrong'>('idle')
 
   useEffect(() => {
-    say(narrator === 'en' ? `Is this ${target.word}?` : `Ist das ${target.word}?`, narrator)
-    say(target.word, 'id')
+    if (firstExerciseOfSession()) say(introFor(narrator, 'trueFalse'), narrator)
+    say(target.word, 'id', { repeat: 2, gapMs: 500 })
   }, [target.id])
 
   const handle = (answer: boolean) => {
@@ -26,21 +26,20 @@ export function TrueFalse({ target, options, narrator, onDone }: ExerciseProps) 
     const right = answer === correctAnswer
     if (right) {
       setState('right'); ding()
-      say(narrator === 'en' ? 'Yes!' : 'Ja!', narrator)
-      setTimeout(() => onDone('correct'), 900)
+      say('Benar!', 'id')
+      setTimeout(() => onDone('correct'), 1000)
     } else {
       setState('wrong'); boing()
-      say(narrator === 'en' ? 'Almost!' : 'Fast!', narrator)
-      setTimeout(() => onDone('wrong'), 1100)
+      say(target.word, 'id', { rate: 0.4 })
+      setTimeout(() => onDone('wrong'), 1200)
     }
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 p-4">
-      <button onClick={() => say(target.word, 'id')}
-        className="rounded-full bg-teal text-white w-20 h-20 grid place-items-center text-4xl shadow-kid">🔊</button>
-      <div className="rounded-[2rem] bg-white p-6 shadow-kid border-4 border-sunny">
-        <WordPicture word={shownWord} size={200} />
+    <div className="flex flex-col items-center gap-4 p-4">
+      <WordHeader word={target.word} />
+      <div className="rounded-[2rem] bg-white p-5 shadow-kid border-4 border-sunny">
+        <WordPicture word={shownWord} size={180} />
       </div>
       <div className="flex gap-8">
         <motion.button whileTap={{ scale: 0.9 }} onClick={() => handle(true)}

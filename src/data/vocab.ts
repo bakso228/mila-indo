@@ -8,6 +8,7 @@ export type Word = {
   de: string
   emoji?: string
   family?: FamilyKey
+  count?: number   // for Angka unit: render as N emoji so quantity is visible
 }
 
 export const WORDS: Record<string, Word> = {
@@ -29,17 +30,17 @@ export const WORDS: Record<string, Word> = {
   tksh:      { id: 'tksh',     word: 'terima kasih', en: 'thank you',   de: 'danke',      emoji: '🙏' },
   jumpa:     { id: 'jumpa',    word: 'sampai jumpa', en: 'goodbye',     de: 'tschüss',    emoji: '🤚' },
 
-  // Angka
-  satu:      { id: 'satu',     word: 'satu',     en: 'one',          de: 'eins',       emoji: '1️⃣' },
-  dua:       { id: 'dua',      word: 'dua',      en: 'two',          de: 'zwei',       emoji: '2️⃣' },
-  tiga:      { id: 'tiga',     word: 'tiga',     en: 'three',        de: 'drei',       emoji: '3️⃣' },
-  empat:     { id: 'empat',    word: 'empat',    en: 'four',         de: 'vier',       emoji: '4️⃣' },
-  lima:      { id: 'lima',     word: 'lima',     en: 'five',         de: 'fünf',       emoji: '5️⃣' },
-  enam:      { id: 'enam',     word: 'enam',     en: 'six',          de: 'sechs',      emoji: '6️⃣' },
-  tujuh:     { id: 'tujuh',    word: 'tujuh',    en: 'seven',        de: 'sieben',     emoji: '7️⃣' },
-  delapan:   { id: 'delapan',  word: 'delapan',  en: 'eight',        de: 'acht',       emoji: '8️⃣' },
-  sembilan:  { id: 'sembilan', word: 'sembilan', en: 'nine',         de: 'neun',       emoji: '9️⃣' },
-  sepuluh:   { id: 'sepuluh',  word: 'sepuluh',  en: 'ten',          de: 'zehn',       emoji: '🔟' },
+  // Angka — visualized as count of apples so the quantity is obvious
+  satu:      { id: 'satu',     word: 'satu',     en: 'one',   de: 'eins',   emoji: '🍎', count: 1 },
+  dua:       { id: 'dua',      word: 'dua',      en: 'two',   de: 'zwei',   emoji: '🍎', count: 2 },
+  tiga:      { id: 'tiga',     word: 'tiga',     en: 'three', de: 'drei',   emoji: '🍎', count: 3 },
+  empat:     { id: 'empat',    word: 'empat',    en: 'four',  de: 'vier',   emoji: '🍎', count: 4 },
+  lima:      { id: 'lima',     word: 'lima',     en: 'five',  de: 'fünf',   emoji: '🍎', count: 5 },
+  enam:      { id: 'enam',     word: 'enam',     en: 'six',   de: 'sechs',  emoji: '🍎', count: 6 },
+  tujuh:     { id: 'tujuh',    word: 'tujuh',    en: 'seven', de: 'sieben', emoji: '🍎', count: 7 },
+  delapan:   { id: 'delapan',  word: 'delapan',  en: 'eight', de: 'acht',   emoji: '🍎', count: 8 },
+  sembilan:  { id: 'sembilan', word: 'sembilan', en: 'nine',  de: 'neun',   emoji: '🍎', count: 9 },
+  sepuluh:   { id: 'sepuluh',  word: 'sepuluh',  en: 'ten',   de: 'zehn',   emoji: '🍎', count: 10 },
 
   // Warna
   merah:     { id: 'merah',    word: 'merah',    en: 'red',          de: 'rot',        emoji: '🟥' },

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useSpeech } from '../../hooks/useSpeech'
 import { useSfx } from '../../hooks/useSfx'
 import { FamilyAvatar } from '../mascots'
-import { instructionFor, type ExerciseProps } from './shared'
+import { firstExerciseOfSession, introFor, type ExerciseProps } from './shared'
 
 export function WhoIsThis({ target, options, narrator, onDone }: ExerciseProps) {
   const { say } = useSpeech()
@@ -12,31 +12,34 @@ export function WhoIsThis({ target, options, narrator, onDone }: ExerciseProps) 
   const [state, setState] = useState<'idle' | 'right' | 'wrong'>('idle')
 
   useEffect(() => {
-    say(instructionFor(narrator, 'whoIsThis', target), narrator)
+    if (firstExerciseOfSession()) say(introFor(narrator, 'whoIsThis'), narrator)
+    // No Indonesian word spoken upfront — she has to pick, which is the game
   }, [target.id])
 
   const handlePick = (id: string) => {
     if (state !== 'idle') return
     setPicked(id)
+    const opt = options.find(o => o.id === id)
+    if (opt) say(opt.word, 'id')
     if (id === target.id) {
       setState('right'); ding()
-      say(target.word, 'id')
-      setTimeout(() => onDone('correct'), 1100)
+      setTimeout(() => { say('Benar!', 'id'); say(target.word, 'id') }, 300)
+      setTimeout(() => onDone('correct'), 1500)
     } else {
       setState('wrong'); boing()
-      say(narrator === 'en' ? 'Almost! Try again.' : 'Fast! Nochmal.', narrator)
-      setTimeout(() => { setState('idle'); setPicked(null) }, 1200)
+      setTimeout(() => { setState('idle'); setPicked(null) }, 1400)
     }
   }
 
   if (!target.family) return null
 
   return (
-    <div className="flex flex-col items-center gap-6 p-4">
+    <div className="flex flex-col items-center gap-4 p-4">
       <div className="rounded-[2rem] bg-white p-4 shadow-kid border-4 border-sunny">
         <FamilyAvatar who={target.family} size={180} />
       </div>
-      <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+      <p className="text-gray-600 text-sm">{narrator === 'en' ? 'Tap the word that matches' : 'Tippe das passende Wort'}</p>
+      <div className="grid grid-cols-2 gap-3 w-full max-w-md">
         {options.map(opt => {
           const isTarget = opt.id === target.id
           const isPicked = picked === opt.id
@@ -48,15 +51,15 @@ export function WhoIsThis({ target, options, narrator, onDone }: ExerciseProps) 
             <motion.button
               key={opt.id}
               whileTap={{ scale: 0.95 }}
-              onClick={() => { handlePick(opt.id); if (state === 'idle') say(opt.word, 'id') }}
-              className={`rounded-3xl ${bg} p-4 shadow-kid border-4 border-white h-24 grid place-items-center`}
+              onClick={() => handlePick(opt.id)}
+              className={`rounded-3xl ${bg} p-3 shadow-kid border-4 border-white flex flex-col items-center gap-1 min-h-[100px] justify-center`}
             >
-              <span className="text-5xl">🔊</span>
+              <span className="text-3xl">🔊</span>
+              <span className="font-bold text-lg">{opt.word}</span>
             </motion.button>
           )
         })}
       </div>
-      <p className="text-sm text-gray-500">{narrator === 'en' ? 'Tap each speaker to listen' : 'Tippe auf die Lautsprecher zum Hören'}</p>
     </div>
   )
 }

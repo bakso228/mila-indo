@@ -19,10 +19,13 @@ export function StickerBook({ progress, narrator, onBack }: { progress: Progress
           return (
             <button key={u.id}
               onClick={() => { if (have) { say(word.word, 'id'); say(narrator === 'en' ? word.en : word.de, narrator) } }}
-              className={`aspect-square rounded-2xl shadow-kid grid place-items-center text-5xl border-4 ${
+              className={`aspect-square rounded-2xl shadow-kid flex flex-col items-center justify-center gap-1 border-4 p-2 ${
                 have ? 'bg-white border-sunny' : 'bg-white/40 border-white grayscale opacity-50'
               }`}>
-              {have ? u.stickerEmoji : '❓'}
+              <span className="text-4xl">{have ? u.stickerEmoji : '❓'}</span>
+              <span className="font-bold text-xs sm:text-sm text-center leading-tight">
+                {have ? word.word : '???'}
+              </span>
             </button>
           )
         })}

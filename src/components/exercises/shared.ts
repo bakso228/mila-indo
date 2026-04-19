@@ -19,14 +19,37 @@ export function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
-export const instructionFor = (narrator: NarratorLang, kind: string, word: Word): string => {
-  const w = narrator === 'en' ? word.en : word.de
+// Session-scoped "have we given the narrator intro yet?" flag
+const INTRO_KEY = 'mila.introSeen.v1'
+export function firstExerciseOfSession(): boolean {
+  try {
+    if (sessionStorage.getItem(INTRO_KEY) === '1') return false
+    sessionStorage.setItem(INTRO_KEY, '1')
+    return true
+  } catch { return false }
+}
+
+// A short one-time narrator intro in the parent's language.
+// Only plays on the very first exercise of the session, to teach Mila what to do.
+export function introFor(narrator: NarratorLang, kind: string): string {
+  if (narrator === 'de') {
+    switch (kind) {
+      case 'hearAndPick': return 'Tippe auf das passende Bild!'
+      case 'pictureMatch': return 'Finde die Paare!'
+      case 'trueFalse': return 'Ja oder Nein?'
+      case 'whoIsThis': return 'Wer ist das? Hör zu und tippe!'
+      case 'sayIt': return 'Sag es mir nach!'
+      case 'countIt': return 'Wie viele sind das?'
+      default: return ''
+    }
+  }
   switch (kind) {
-    case 'hearAndPick': return narrator === 'en' ? `Which one is ${word.word}?` : `Welches ist ${word.word}?`
-    case 'pictureMatch':return narrator === 'en' ? `Match the sounds to the pictures!` : `Finde die Paare!`
-    case 'trueFalse':   return narrator === 'en' ? `Is this ${word.word}?` : `Ist das ${word.word}?`
-    case 'whoIsThis':   return narrator === 'en' ? `Who is this in Indonesian?` : `Wer ist das auf Indonesisch?`
-    case 'sayIt':       return narrator === 'en' ? `Can you say ${word.word}? That means ${w}!` : `Kannst du ${word.word} sagen? Das heißt ${w}!`
+    case 'hearAndPick': return 'Tap the matching picture!'
+    case 'pictureMatch': return 'Find the pairs!'
+    case 'trueFalse': return 'Yes or no?'
+    case 'whoIsThis': return 'Who is this? Listen and tap!'
+    case 'sayIt': return 'Say it after me!'
+    case 'countIt': return 'How many?'
     default: return ''
   }
 }

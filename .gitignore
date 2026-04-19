@@ -9,3 +9,6 @@ dist-ssr
 *.log
 .playwright-mcp
 *.tsbuildinfo
+# local Playwright screenshots
+/lesson1-*.png
+/v2-*.png

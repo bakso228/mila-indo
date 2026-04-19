@@ -1,6 +1,6 @@
 import { WORDS } from './vocab'
 
-export type ExerciseKind = 'hearAndPick' | 'pictureMatch' | 'trueFalse' | 'whoIsThis' | 'sayIt'
+export type ExerciseKind = 'hearAndPick' | 'pictureMatch' | 'trueFalse' | 'whoIsThis' | 'sayIt' | 'countIt'
 
 export type Exercise = {
   kind: ExerciseKind
@@ -84,23 +84,23 @@ export const UNITS: Unit[] = [
     ]
   },
   {
-    id: 'angka', title: 'Numbers', emoji: '🔢', color: 'bg-teal',
+    id: 'angka', title: 'Angka', emoji: '🔢', color: 'bg-teal',
     stickerEmoji: '⭐', stickerWordId: 'lima',
     lessons: [
       { id: 'l1', title: '1 to 5', exercises: [
-        pick('hearAndPick', 'satu', ['dua','tiga','empat']),
-        pick('hearAndPick', 'dua',  ['satu','tiga','lima']),
-        pick('hearAndPick', 'tiga', ['satu','empat','lima']),
+        pick('countIt',     'satu', ['dua','tiga','empat']),
+        pick('countIt',     'dua',  ['satu','tiga','lima']),
+        pick('countIt',     'tiga', ['satu','empat','lima']),
         pick('hearAndPick', 'empat',['tiga','lima','dua']),
-        pick('hearAndPick', 'lima', ['empat','tiga','satu']),
+        pick('countIt',     'lima', ['empat','tiga','satu']),
         say('satu'), say('lima'),
       ]},
       { id: 'l2', title: '6 to 10', exercises: [
-        pick('hearAndPick', 'enam',    ['tujuh','delapan','lima']),
-        pick('hearAndPick', 'tujuh',   ['enam','delapan','sembilan']),
+        pick('countIt',     'enam',    ['tujuh','delapan','lima']),
+        pick('countIt',     'tujuh',   ['enam','delapan','sembilan']),
         pick('hearAndPick', 'delapan', ['tujuh','sembilan','sepuluh']),
-        pick('hearAndPick', 'sembilan',['delapan','sepuluh','tujuh']),
-        pick('hearAndPick', 'sepuluh', ['sembilan','delapan','satu']),
+        pick('countIt',     'sembilan',['delapan','sepuluh','tujuh']),
+        pick('countIt',     'sepuluh', ['sembilan','delapan','satu']),
         say('sepuluh'),
       ]},
     ]

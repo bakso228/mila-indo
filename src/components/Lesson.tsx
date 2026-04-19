@@ -6,6 +6,7 @@ import { PictureMatch } from './exercises/PictureMatch'
 import { TrueFalse } from './exercises/TrueFalse'
 import { WhoIsThis } from './exercises/WhoIsThis'
 import { SayIt } from './exercises/SayIt'
+import { CountIt } from './exercises/CountIt'
 import { shuffle } from './exercises/shared'
 import { Hearts } from './Hearts'
 import { ProgressBar } from './ProgressBar'
@@ -140,6 +141,7 @@ function ExerciseView({ ex, options, narrator, onDone }:
     case 'trueFalse':    return <TrueFalse {...shared} />
     case 'whoIsThis':    return <WhoIsThis {...shared} />
     case 'sayIt':        return <SayIt {...shared} />
+    case 'countIt':      return <CountIt {...shared} />
   }
 }
 
@@ -148,8 +150,11 @@ function buildOptions(ex: Exercise): Word[] {
   const distractors = (ex.distractorIds ?? []).map(id => WORDS[id]).filter(Boolean)
   const base = [target, ...distractors]
   // Ensure at least 4 options for the picker/matching exercises
+  const numeric = ex.kind === 'countIt'
   while (base.length < 4) {
-    const candidates = Object.values(WORDS).filter(w => !base.find(b => b.id === w.id))
+    const candidates = Object.values(WORDS).filter(w =>
+      !base.find(b => b.id === w.id) && (numeric ? typeof w.count === 'number' : true)
+    )
     if (!candidates.length) break
     base.push(candidates[Math.floor(Math.random() * candidates.length)])
   }
